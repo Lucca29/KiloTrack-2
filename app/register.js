@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
   TouchableOpacity,
   SafeAreaView,
   Alert,
@@ -12,69 +12,47 @@ import {
   TouchableWithoutFeedback
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { auth, db } from '../firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { router } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
 
-function LoginScreen() {
+export default function RegisterScreen() {
   const [focusedInput, setFocusedInput] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleRegisterPress = () => {
-    console.log('Navigation vers Register');
-    router.push('/register');
-  };
-
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const handleRegister = async () => {
+    if (!email || !password || !confirmPassword) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
       return;
     }
 
     try {
       setLoading(true);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Vérifier si l'utilisateur a déjà configuré son véhicule
-      const userId = userCredential.user.uid;
-      const vehicleRef = doc(db, 'vehicles', userId);
-      const vehicleDoc = await getDoc(vehicleRef);
-
-      if (vehicleDoc.exists()) {
-        // Si les données du véhicule existent, aller directement au dashboard
-        router.replace('/dashboard');
-      } else {
-        // Sinon, aller à la page de configuration
-        router.replace('/vehicle-config');
-      }
-
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('Inscription réussie:', userCredential.user.email);
+      router.replace('/vehicle-config');
     } catch (error) {
-      console.error('Erreur de connexion:', error);
-      let errorMessage = 'Une erreur est survenue lors de la connexion';
-      
-      if (error.code) {
-        switch (error.code) {
-          case 'auth/invalid-email':
-            errorMessage = 'Adresse email invalide';
-            break;
-          case 'auth/user-not-found':
-            errorMessage = 'Aucun compte ne correspond à cet email';
-            break;
-          case 'auth/wrong-password':
-            errorMessage = 'Mot de passe incorrect';
-            break;
-          default:
-            errorMessage = `Erreur: ${error.code}`;
-            break;
-        }
+      console.error('Erreur:', error);
+      let errorMessage = 'Une erreur est survenue';
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Cette adresse email est déjà utilisée';
       }
-      Alert.alert('Erreur de connexion', errorMessage);
+      Alert.alert('Erreur d\'inscription', errorMessage);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBackToLogin = () => {
+    router.replace('/');
   };
 
   return (
@@ -88,8 +66,8 @@ function LoginScreen() {
         />
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.formContainer}>
-            <Text style={styles.title}>KiloTrack</Text>
-            <Text style={styles.subtitle}>Suivez vos kilomètres comme des rois !</Text>
+            <Text style={styles.title}>Inscription</Text>
+            <Text style={styles.subtitle}>Créez votre compte</Text>
             
             <View style={styles.inputContainer}>
               <TextInput
@@ -122,11 +100,26 @@ function LoginScreen() {
                 onChangeText={setPassword}
                 editable={!loading}
               />
+
+              <TextInput
+                style={[
+                  styles.input,
+                  focusedInput === 'confirmPassword' && styles.inputFocused
+                ]}
+                placeholder="Confirmer le mot de passe"
+                placeholderTextColor="rgba(147, 129, 255, 0.5)"
+                secureTextEntry
+                onFocus={() => setFocusedInput('confirmPassword')}
+                onBlur={() => setFocusedInput(null)}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                editable={!loading}
+              />
             </View>
 
             <View style={styles.button}>
               <TouchableOpacity 
-                onPress={handleLogin}
+                onPress={handleRegister}
                 disabled={loading}
               >
                 <LinearGradient
@@ -138,18 +131,18 @@ function LoginScreen() {
                   {loading ? (
                     <ActivityIndicator color="#9381FF" />
                   ) : (
-                    <Text style={styles.buttonText}>Se connecter</Text>
+                    <Text style={styles.buttonText}>S'inscrire</Text>
                   )}
                 </LinearGradient>
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity 
-              style={styles.registerButton}
-              onPress={handleRegisterPress}
+              style={styles.loginButton}
+              onPress={handleBackToLogin}
             >
-              <Text style={styles.registerText}>
-                Pas de compte ? S'inscrire
+              <Text style={styles.loginText}>
+                Déjà un compte ? Se connecter
               </Text>
             </TouchableOpacity>
           </View>
@@ -172,16 +165,12 @@ const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
   },
   formContainer: {
-    width: '88%',
-    padding: 25,
-    borderRadius: 30,
-    backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(248, 247, 255, 0.3)'
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    gap: 20,
   },
   title: {
     fontSize: 38,
@@ -230,15 +219,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold'
   },
-  registerButton: {
-    padding: 10,
-    marginTop: 5
+  loginButton: {
+    padding: 10
   },
-  registerText: {
+  loginText: {
     color: '#FFD8BE',
     textAlign: 'center',
     fontSize: 14
   }
-});
-
-export default LoginScreen;
+}); 
