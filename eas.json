@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "version": ">= 5.9.1"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "simulator": true,
+        "buildConfiguration": "Debug"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "ios": {
+        "buildConfiguration": "Release"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "redpronos.contact@gmail.com",
+        "ascAppId": "6740035886",
+        "appleTeamId": "ZJ59D98395"
+      }
+    }
+  }
+}

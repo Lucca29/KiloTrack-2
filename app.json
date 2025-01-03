@@ -1,21 +1,33 @@
 {
   "expo": {
-    "name": "KiloTrack",
-    "slug": "KiloTrack",
-    "version": "1.0.0",
+    "name": "Milesio",
+    "slug": "Milesio",
+    "version": "6.0.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "13",
+      "bundleIdentifier": "com.votrecompany.cartracking",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#9381FF"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "versionCode": 5,
+      "package": "com.votrecompany.cartracking"
     },
     "web": {
       "bundler": "metro",
@@ -32,10 +44,35 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "70e463d3-b588-4979-bf56-de5a9ec0b85e"
+      }
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#9381FF",
+      "translucent": false
+    },
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#9381FF"
     }
   }
 }
