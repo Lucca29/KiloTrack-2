@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "13",
+      "buildNumber": "14",
       "bundleIdentifier": "com.votrecompany.cartracking",
       "config": {
         "usesNonExemptEncryption": false
