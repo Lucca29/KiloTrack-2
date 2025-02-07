@@ -16,12 +16,20 @@ import { auth, firestore } from '../../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { router } from 'expo-router';
 import { checkShowReviewInStats } from './components/StoreReview';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function StatisticsScreen() {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
+
+  // Définir les couleurs d'alerte indépendantes du thème
+  const alertColors = {
+    positive: '#4CAF50', // Vert
+    negative: '#FF5252'  // Rouge
+  };
 
   useEffect(() => {
     // On vérifie simplement si on doit montrer le popup
@@ -88,10 +96,13 @@ export default function StatisticsScreen() {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
         <LinearGradient
-          colors={['#9381FF', '#B8B8FF', '#9381FF']}
+          colors={theme.isDarkMode ? 
+            ['#1A1A1A', '#2A2A2A', '#1A1A1A'] : 
+            ['#9381FF', '#B8B8FF', '#9381FF']
+          }
           style={styles.background}
         />
-        <ActivityIndicator size="large" color="#FFD8BE" />
+        <ActivityIndicator size="large" color={theme.colors.secondary} />
       </View>
     );
   }
@@ -99,9 +110,10 @@ export default function StatisticsScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#9381FF', '#B8B8FF', '#9381FF']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={theme.isDarkMode ? 
+          ['#1A1A1A', '#2A2A2A', '#1A1A1A'] : 
+          ['#9381FF', '#B8B8FF', '#9381FF']
+        }
         style={styles.background}
       />
       <SafeAreaView style={styles.safeArea}>
@@ -118,7 +130,7 @@ export default function StatisticsScreen() {
 
         <ScrollView style={styles.scrollView}>
           {/* Progression générale */}
-          <View style={styles.card}>
+          <View style={[styles.card, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
             <Text style={styles.cardTitle}>Progression générale</Text>
             <View style={styles.progressBar}>
               <View 
@@ -137,7 +149,7 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Kilométrage */}
-          <View style={styles.card}>
+          <View style={[styles.card, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
             <Text style={styles.cardTitle}>Kilométrage</Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Actuel:</Text>
@@ -151,7 +163,8 @@ export default function StatisticsScreen() {
               <Text style={styles.statLabel}>Différence:</Text>
               <Text style={[
                 styles.statValue,
-                stats.kmDifference > 0 ? styles.negative : styles.positive
+                { color: stats.kmDifference > 0 ? alertColors.negative : alertColors.positive },
+                stats.kmDifference > 0 ? { fontWeight: 'bold' } : {}
               ]}>
                 {stats.kmDifference > 0 ? '+' : ''}{stats.kmDifference} km
               </Text>
@@ -159,7 +172,7 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Moyennes */}
-          <View style={styles.card}>
+          <View style={[styles.card, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
             <Text style={styles.cardTitle}>Moyennes quotidiennes</Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Théorique:</Text>
@@ -169,9 +182,10 @@ export default function StatisticsScreen() {
               <Text style={styles.statLabel}>Réelle:</Text>
               <Text style={[
                 styles.statValue,
-                parseFloat(stats.actualKmPerDay) > parseFloat(stats.theoreticalKmPerDay) 
-                  ? styles.negative 
-                  : styles.positive
+                { color: parseFloat(stats.actualKmPerDay) > parseFloat(stats.theoreticalKmPerDay) 
+                  ? alertColors.negative 
+                  : alertColors.positive },
+                parseFloat(stats.actualKmPerDay) > parseFloat(stats.theoreticalKmPerDay) ? { fontWeight: 'bold' } : {}
               ]}>
                 {stats.actualKmPerDay} km/jour
               </Text>
@@ -179,13 +193,16 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Prévisions */}
-          <View style={styles.card}>
+          <View style={[styles.card, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
             <Text style={styles.cardTitle}>Prévisions</Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Kilométrage final estimé:</Text>
               <Text style={[
                 styles.statValue,
-                stats.predictedFinalKm > stats.totalAllowedKm ? styles.negative : styles.positive
+                { color: stats.predictedFinalKm > stats.totalAllowedKm 
+                  ? alertColors.negative 
+                  : alertColors.positive },
+                stats.predictedFinalKm > stats.totalAllowedKm ? { fontWeight: 'bold' } : {}
               ]}>
                 {stats.predictedFinalKm} km
               </Text>
@@ -197,7 +214,7 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Dates */}
-          <View style={styles.card}>
+          <View style={[styles.card, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
             <Text style={styles.cardTitle}>Informations</Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Date de début:</Text>

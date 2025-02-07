@@ -1,16 +1,24 @@
+import { ThemeProvider } from '../../app/context/ThemeContext';
 import { Stack } from 'expo-router';
-import { View } from 'react-native';
 
 export default function AppLayout() {
   return (
-    <View style={{ flex: 1, backgroundColor: '#9381FF' }}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: '#9381FF' },
-          animation: 'none',
-        }}
-      />
-    </View>
+    <ThemeProvider>
+      <Stack screenOptions={{
+        headerShown: false,  // Cache le header par défaut
+        contentStyle: {
+          backgroundColor: 'transparent'
+        }
+      }}>
+        <Stack.Screen 
+          name="dashboard" 
+          options={{
+            headerShown: false,
+            animation: 'fade'
+          }}
+        />
+        {/* autres screens */}
+      </Stack>
+    </ThemeProvider>
   );
 } 

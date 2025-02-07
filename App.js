@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
+import { ThemeProvider, useTheme } from './app/context/ThemeContext';
 import LoginScreen from './app/index';
 import HomeScreen from './screens/HomeScreen';
 import RegisterScreen from './screens/RegisterScreen';
@@ -45,26 +46,34 @@ function ScreenRenderer({ currentScreen }) {
   }
 }
 
-// Composant principal
+// Composant principal modifié
 function AppContent() {
+  const { theme, toggleTheme } = useTheme();
+  
   return (
-    <View style={styles.container}>
+    <ThemeProvider>
       <NavigationProvider>
-        <ScreenRenderer currentScreen="Login" />
+        <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+          <ScreenRenderer currentScreen="Login" />
+        </View>
       </NavigationProvider>
-    </View>
+    </ThemeProvider>
   );
 }
 
 // Export par défaut
 export default function App() {
   console.log('Initialisation de App');
-  return <AppContent />;
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#9381FF'
+    // La couleur de fond sera gérée par le thème
   }
 }); 

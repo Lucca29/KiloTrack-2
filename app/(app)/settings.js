@@ -22,6 +22,7 @@ import { doc, deleteDoc, collection, query, orderBy, getDocs, writeBatch } from 
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { testReviewPrompt } from './components/StoreReview';
+import { useTheme } from '../context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -44,9 +45,11 @@ if (Platform.OS === 'ios') {
 const scale = Math.min(width, height) / baseWidth;
 
 export default function SettingsScreen() {
+  const { theme } = useTheme();
   const [kmHistory, setKmHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const swipeableRefs = useRef(new Map()).current;
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     fetchKmHistory();
@@ -278,12 +281,50 @@ export default function SettingsScreen() {
     router.push('/vehicle-config');
   };
 
+  const handleDeleteAllHistory = async () => {
+    Alert.alert(
+      'Supprimer l\'historique',
+      'Êtes-vous sûr de vouloir supprimer tout l\'historique des kilomètres ? Cette action est irréversible.',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel'
+        },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const userId = auth.currentUser.uid;
+              const historyRef = collection(firestore, `vehicles/${userId}/history`);
+              const querySnapshot = await getDocs(historyRef);
+              
+              const batch = writeBatch(firestore);
+              querySnapshot.docs.forEach((doc) => {
+                batch.delete(doc.ref);
+              });
+              await batch.commit();
+              
+              // Mettre à jour l'état local
+              setKmHistory([]);
+              Alert.alert('Succès', 'L\'historique a été supprimé avec succès');
+            } catch (error) {
+              console.error('Erreur lors de la suppression:', error);
+              Alert.alert('Erreur', 'Impossible de supprimer l\'historique');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#9381FF', '#B8B8FF', '#9381FF']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={theme.isDarkMode ? 
+          ['#1A1A1A', '#2A2A2A', '#1A1A1A'] : 
+          ['#9381FF', '#B8B8FF', '#9381FF']
+        }
         style={styles.background}
       />
       <SafeAreaView style={styles.safeArea}>
@@ -294,35 +335,75 @@ export default function SettingsScreen() {
           >
             <Ionicons name="chevron-back" size={24} color="#F8F7FF" />
           </TouchableOpacity>
-          <Text style={styles.title}>Paramètres</Text>
+          <Text style={[styles.title, theme.isDarkMode && { color: theme.colors.text }]}>Paramètres</Text>
           <View style={styles.placeholder} />
         </View>
 
         <ScrollView style={styles.scrollView}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Compte</Text>
-            <View style={styles.card}>
-              <Text style={styles.emailText}>{auth.currentUser?.email}</Text>
+            <View style={[styles.card, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
+              <Text style={[styles.emailText, theme.isDarkMode && { color: theme.colors.text }]}>
+                {auth.currentUser?.email}
+              </Text>
             </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Historique des kilomètres</Text>
-            <View style={styles.historyCard}>
-              {loading ? (
-                <ActivityIndicator color="#FFD8BE" />
-              ) : kmHistory.length > 0 ? (
-                kmHistory.map((entry, index) => (
-                  <View key={entry.id}>
-                    {renderHistoryItem(entry, index)}
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.noHistoryText}>
-                  Aucun historique disponible
-                </Text>
-              )}
+            <View style={styles.sectionHeader}>
+              <TouchableOpacity 
+                style={styles.sectionTitleContainer}
+                onPress={() => setShowHistory(!showHistory)}
+              >
+                <Text style={styles.sectionTitle}>Historique des kilomètres</Text>
+                <View style={styles.iconContainer}>
+                  <LinearGradient
+                    colors={['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
+                    style={styles.iconBackground}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Ionicons 
+                      name={showHistory ? "chevron-up" : "chevron-down"} 
+                      size={14}
+                      color="#FFD8BE" 
+                    />
+                  </LinearGradient>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.deleteHistoryButton}
+                onPress={handleDeleteAllHistory}
+              >
+                <LinearGradient
+                  colors={['rgba(255, 82, 82, 0.1)', 'rgba(255, 82, 82, 0.2)']}
+                  style={styles.iconBackground}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Ionicons name="trash-outline" size={20} color="#FF5252" />
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
+
+            {showHistory && (
+              <View style={[styles.historyCard, theme.isDarkMode && { backgroundColor: theme.colors.card }]}>
+                {loading ? (
+                  <ActivityIndicator color="#FFD8BE" />
+                ) : kmHistory.length > 0 ? (
+                  kmHistory.map((entry, index) => (
+                    <View key={entry.id}>
+                      {renderHistoryItem(entry, index)}
+                    </View>
+                  ))
+                ) : (
+                  <Text style={styles.noHistoryText}>
+                    Aucun historique disponible
+                  </Text>
+                )}
+              </View>
+            )}
           </View>
 
           <View style={styles.bottomButtonsContainer}>
@@ -337,7 +418,7 @@ export default function SettingsScreen() {
                 style={styles.buttonGradient}
               >
                 <Ionicons name="car" size={24} color="#FFD8BE" />
-                <Text style={styles.configText}>Reconfigurer mon véhicule</Text>
+                <Text style={[styles.configText, { color: '#FFD8BE' }]}>Reconfigurer mon véhicule</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -352,7 +433,7 @@ export default function SettingsScreen() {
                 style={styles.buttonGradient}
               >
                 <Ionicons name="star" size={24} color="#FFD8BE" />
-                <Text style={styles.configText}>Donnez votre avis</Text>
+                <Text style={[styles.configText, { color: '#FFD8BE' }]}>Donnez votre avis</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -367,7 +448,9 @@ export default function SettingsScreen() {
                 style={styles.buttonGradient}
               >
                 <Ionicons name="log-out" size={24} color="#FF5252" />
-                <Text style={styles.logoutText}>Se déconnecter</Text>
+                <Text style={[styles.logoutText, theme.isDarkMode && { color: theme.colors.text }]}>
+                  Se déconnecter
+                </Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -375,7 +458,9 @@ export default function SettingsScreen() {
               style={styles.deleteAccountButton}
               onPress={handleDeleteAccount}
             >
-              <Text style={styles.deleteAccountText}>Supprimer mon compte</Text>
+              <Text style={[styles.deleteAccountText, theme.isDarkMode && { color: theme.colors.text }]}>
+                Supprimer mon compte
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -408,7 +493,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   title: {
-    fontSize: 24 * scale,
+    fontSize: 24,
     color: '#F8F7FF',
     fontWeight: 'bold',
   },
@@ -425,14 +510,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     color: '#FFD8BE',
-    marginBottom: 15,
     fontWeight: '600',
+    paddingTop: 0,
   },
   card: {
     backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderRadius: 15 * scale,
-    padding: 20 * scale,
-    marginBottom: 15 * scale,
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
   },
   emailText: {
     color: '#F8F7FF',
@@ -475,7 +560,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 15,
-    backgroundColor: 'rgba(248, 247, 255, 0.15)',
   },
   historyItemBorder: {
     borderBottomWidth: 1,
@@ -501,7 +585,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   noHistoryText: {
-    color: '#F8F7FF',
     textAlign: 'center',
     opacity: 0.7,
     padding: 20,
@@ -521,7 +604,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   deleteText: {
-    color: '#FFF',
     fontSize: 12,
     marginTop: 4,
     fontWeight: '600',
@@ -532,8 +614,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteAccountText: {
-    color: '#FF5252',
-    fontSize: 12,
     textDecorationLine: 'underline',
   },
   bottomButtonsContainer: {
@@ -545,9 +625,35 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   configText: {
-    color: '#FFD8BE',
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    paddingTop: 8,
+  },
+  iconContainer: {
+    marginLeft: 10,
+    alignSelf: 'center',
+    marginTop: 2,
+  },
+  iconBackground: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteHistoryButton: {
+    marginLeft: 15,
   },
 }); 
