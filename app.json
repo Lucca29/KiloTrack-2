@@ -2,7 +2,7 @@
   "expo": {
     "name": "Milesio",
     "slug": "Milesio",
-    "version": "6.1.2",
+    "version": "6.1.7",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
