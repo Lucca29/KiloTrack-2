@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Milesio.app"
-               BlueprintName = "Milesio"
-               ReferencedContainer = "container:Milesio.xcodeproj">
+               BuildableName = "KiloTrack.app"
+               BlueprintName = "KiloTrack"
+               ReferencedContainer = "container:KiloTrack.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MilesioTests.xctest"
-               BlueprintName = "MilesioTests"
-               ReferencedContainer = "container:Milesio.xcodeproj">
+               BuildableName = "KiloTrackTests.xctest"
+               BlueprintName = "KiloTrackTests"
+               ReferencedContainer = "container:KiloTrack.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Milesio.app"
-            BlueprintName = "Milesio"
-            ReferencedContainer = "container:Milesio.xcodeproj">
+            BuildableName = "KiloTrack.app"
+            BlueprintName = "KiloTrack"
+            ReferencedContainer = "container:KiloTrack.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Milesio.app"
-            BlueprintName = "Milesio"
-            ReferencedContainer = "container:Milesio.xcodeproj">
+            BuildableName = "KiloTrack.app"
+            BlueprintName = "KiloTrack"
+            ReferencedContainer = "container:KiloTrack.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
