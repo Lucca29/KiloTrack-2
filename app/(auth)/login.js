@@ -19,6 +19,8 @@ import { auth } from '../../firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../app/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '../../firebaseConfig';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -86,8 +88,19 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, emailToUse, passwordToUse);
+      
+      // Vérifier si la configuration du véhicule existe
+      const userId = userCredential.user.uid;
+      const vehicleDoc = await getDoc(doc(firestore, 'vehicles', userId));
+      
       await saveCredentials(emailToUse, passwordToUse);
-      router.replace('/(app)/dashboard');
+
+      // Rediriger vers la configuration si elle n'existe pas
+      if (!vehicleDoc.exists()) {
+        router.replace('/(app)/vehicle-config');
+      } else {
+        router.replace('/(app)/dashboard');
+      }
     } catch (error) {
       console.error('Erreur de connexion:', error);
       let errorMessage = 'Une erreur est survenue lors de la connexion';
@@ -97,7 +110,6 @@ export default function LoginScreen() {
       }
       
       Alert.alert('Erreur', errorMessage);
-      // Si la connexion échoue, on efface les identifiants sauvegardés
       await AsyncStorage.removeItem('userEmail');
       await AsyncStorage.removeItem('userPassword');
     } finally {
