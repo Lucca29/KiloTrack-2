@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '../../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterScreen() {
   const [focusedInput, setFocusedInput] = useState(null);
@@ -22,6 +23,15 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const saveCredentials = async (email, password) => {
+    try {
+      await AsyncStorage.setItem('userEmail', email);
+      await AsyncStorage.setItem('userPassword', password);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des identifiants:', error);
+    }
+  };
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -37,15 +47,24 @@ export default function RegisterScreen() {
     try {
       setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Inscription réussie:', userCredential.user.email);
-      router.replace('/vehicle-config');
+      
+      // Sauvegarder les identifiants après l'inscription réussie
+      await saveCredentials(email, password);
+      
+      router.replace('/(app)/vehicle-config');
     } catch (error) {
-      console.error('Erreur:', error);
-      let errorMessage = 'Une erreur est survenue';
+      console.error('Erreur d\'inscription:', error);
+      let errorMessage = 'Une erreur est survenue lors de l\'inscription';
+      
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Cette adresse email est déjà utilisée';
+        errorMessage = 'Cet email est déjà utilisé';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Email invalide';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'Le mot de passe doit contenir au moins 6 caractères';
       }
-      Alert.alert('Erreur d\'inscription', errorMessage);
+      
+      Alert.alert('Erreur', errorMessage);
     } finally {
       setLoading(false);
     }

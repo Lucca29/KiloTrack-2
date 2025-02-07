@@ -14,6 +14,9 @@ const config = {
   ios: {
     bundleIdentifier: "com.votrecompany.kilotrack",
     buildNumber: "1.0.0"
+  },
+  android: {
+    package: "com.votrecompany.kilotrack"
   }
 };
 

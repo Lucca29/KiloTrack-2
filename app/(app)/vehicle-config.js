@@ -10,13 +10,35 @@ import {
   ActivityIndicator,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Dimensions,
+  StatusBar
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { auth, firestore } from '../../firebaseConfig';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, addDoc } from 'firebase/firestore';
+
+const { width, height } = Dimensions.get('window');
+let baseWidth = Platform.OS === 'ios' ? 375 : 360;
+
+if (Platform.OS === 'ios') {
+  if (width >= 428) { // iPhone Pro Max
+    baseWidth = 428;
+  } else if (width >= 390) { // iPhone 14, 13, 12
+    baseWidth = 390;
+  }
+} else {
+  // Ajustement pour Android
+  if (width >= 400) { // Grands écrans Android
+    baseWidth = 400;
+  } else if (width >= 320) { // Petits écrans Android
+    baseWidth = 320;
+  }
+}
+
+const scale = Math.min(width, height) / baseWidth;
 
 export default function VehicleConfigScreen() {
   const [loading, setLoading] = useState(false);
@@ -96,20 +118,25 @@ export default function VehicleConfigScreen() {
 
     try {
       setLoading(true);
-      const userId = auth.currentUser.uid;
-      
+      const user = auth.currentUser;
       const vehicleData = {
         startDate: startDate.toISOString(),
         currentKm: parseInt(currentKm),
         yearlyKm: parseInt(yearlyKm),
         leaseDuration: parseInt(leaseDuration),
-        lastUpdate: new Date().toISOString(),
-        createdAt: isUpdate ? undefined : new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
 
-      await setDoc(doc(firestore, 'vehicles', userId), vehicleData, { merge: true });
+      await setDoc(doc(firestore, 'vehicles', user.uid), vehicleData);
       
-      console.log('Configuration sauvegardée');
+      const historyRef = collection(firestore, `vehicles/${user.uid}/history`);
+      await addDoc(historyRef, {
+        km: parseInt(currentKm),
+        timestamp: new Date().toISOString(),
+        type: isUpdate ? 'update' : 'initial'
+      });
+
       router.replace('/(app)/dashboard');
     } catch (error) {
       console.error('Erreur:', error);
@@ -227,6 +254,7 @@ export default function VehicleConfigScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#9381FF',
   },
   background: {
     position: 'absolute',
@@ -245,11 +273,11 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   title: {
-    fontSize: 38,
+    fontSize: 32 * scale,
     color: '#F8F7FF',
-    textAlign: 'center',
     fontWeight: 'bold',
-    marginBottom: 8
+    marginBottom: 10 * scale,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
@@ -261,18 +289,19 @@ const styles = StyleSheet.create({
     gap: 15
   },
   input: {
-    height: 55,
+    height: 55 * scale,
     backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderRadius: 15,
-    paddingHorizontal: 20,
+    borderRadius: 15 * scale,
+    paddingHorizontal: 20 * scale,
     color: '#F8F7FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
     borderWidth: 1,
-    borderColor: 'rgba(248, 247, 255, 0.2)'
+    borderColor: '#F8F7FF',
+    marginBottom: 15 * scale,
   },
   inputFocused: {
-    borderColor: '#FFD8BE',
-    backgroundColor: 'rgba(255, 216, 190, 0.1)'
+    borderColor: '#F8F7FF',
+    borderWidth: 1,
   },
   dateButton: {
     height: 55,
@@ -288,21 +317,20 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   button: {
-    height: 55,
-    marginTop: 30,
-    marginBottom: 15,
-    borderRadius: 15,
-    overflow: 'hidden'
+    height: 55 * scale,
+    borderRadius: 15 * scale,
+    overflow: 'hidden',
+    marginTop: 20 * scale,
   },
   buttonGradient: {
-    height: 55,
+    height: 55 * scale,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   buttonText: {
     color: '#9381FF',
-    fontSize: 18,
-    fontWeight: 'bold'
+    fontSize: 18 * scale,
+    fontWeight: 'bold',
   },
   datePickerWrapper: {
     marginBottom: 15,

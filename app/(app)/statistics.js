@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { auth, firestore } from '../../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { router } from 'expo-router';
+import { checkShowReviewInStats } from './components/StoreReview';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,12 @@ export default function StatisticsScreen() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
+    // On vérifie simplement si on doit montrer le popup
+    checkShowReviewInStats();
+    
+    // Pour débugger
+    console.log('StatisticsScreen mounted - checking review');
+
     fetchStats();
   }, []);
 

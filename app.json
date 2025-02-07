@@ -2,7 +2,7 @@
   "expo": {
     "name": "Milesio",
     "slug": "Milesio",
-    "version": "6.0.6",
+    "version": "6.1.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -10,8 +10,9 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "14",
-      "bundleIdentifier": "com.votrecompany.cartracking",
+      "buildNumber": "1.0.0",
+      "bundleIdentifier": "com.lucca29.KiloTrack",
+      "deploymentTarget": "16.0",
       "config": {
         "usesNonExemptEncryption": false
       },

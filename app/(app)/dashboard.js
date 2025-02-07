@@ -7,12 +7,14 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  Platform,
   ActivityIndicator,
   Modal,
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
-  Alert
+  Alert,
+  StatusBar
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +22,25 @@ import { auth, firestore } from '../../firebaseConfig';
 import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+let baseWidth = Platform.OS === 'ios' ? 375 : 360;
+
+if (Platform.OS === 'ios') {
+  if (width >= 428) { // iPhone Pro Max
+    baseWidth = 428;
+  } else if (width >= 390) { // iPhone 14, 13, 12
+    baseWidth = 390;
+  }
+} else {
+  // Ajustement pour Android
+  if (width >= 400) { // Grands écrans Android
+    baseWidth = 400;
+  } else if (width >= 320) { // Petits écrans Android
+    baseWidth = 320;
+  }
+}
+
+const scale = Math.min(width, height) / baseWidth;
 
 export default function DashboardScreen() {
   const [vehicleData, setVehicleData] = useState(null);
@@ -379,6 +399,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#9381FF',
   },
   background: {
     position: 'absolute',
@@ -392,133 +413,135 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    padding: 20,
+    padding: 20 * scale,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 20 * scale,
   },
   title: {
-    fontSize: 32,
+    fontSize: 32 * scale,
     color: '#F8F7FF',
     fontWeight: 'bold',
+    marginBottom: 10 * scale,
+    textAlign: 'center',
   },
   settingsButton: {
-    padding: 8,
+    padding: 8 * scale,
   },
   mainCard: {
     backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 20 * scale,
+    padding: 20 * scale,
+    marginBottom: 20 * scale,
   },
   mainCardTitle: {
     color: '#FFD8BE',
-    fontSize: 18,
-    marginBottom: 15,
+    fontSize: 18 * scale,
+    marginBottom: 15 * scale,
   },
   progressContainer: {
     alignItems: 'center',
   },
   progressBar: {
     width: '100%',
-    height: 12,
+    height: 12 * scale,
     backgroundColor: 'rgba(248, 247, 255, 0.2)',
-    borderRadius: 6,
+    borderRadius: 6 * scale,
     overflow: 'hidden',
-    marginBottom: 10,
+    marginBottom: 10 * scale,
   },
   progressFill: {
     height: '100%',
-    borderRadius: 6,
+    borderRadius: 6 * scale,
   },
   progressText: {
     color: '#F8F7FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
   },
   statsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 20 * scale,
   },
   statsCard: {
     backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderRadius: 15,
-    padding: 15,
-    width: (width - 60) / 2,
+    borderRadius: 15 * scale,
+    padding: 15 * scale,
+    width: (width - 60 * scale) / 2,
     alignItems: 'center',
   },
   statsValue: {
     color: '#F8F7FF',
-    fontSize: 24,
+    fontSize: 24 * scale,
     fontWeight: 'bold',
-    marginVertical: 5,
+    marginVertical: 5 * scale,
   },
   statsLabel: {
     color: '#FFD8BE',
-    fontSize: 14,
+    fontSize: 14 * scale,
   },
   predictionCard: {
     backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 20 * scale,
+    padding: 20 * scale,
+    marginBottom: 20 * scale,
   },
   predictionTitle: {
     color: '#FFD8BE',
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 18 * scale,
+    marginBottom: 10 * scale,
   },
   predictionContent: {
     alignItems: 'center',
   },
   predictionValue: {
     color: '#F8F7FF',
-    fontSize: 32,
+    fontSize: 32 * scale,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 5 * scale,
   },
   predictionStatus: {
-    fontSize: 16,
+    fontSize: 16 * scale,
     fontWeight: '500',
   },
   actionButtons: {
-    gap: 15,
-    marginBottom: 20,
+    gap: 15 * scale,
+    marginBottom: 20 * scale,
   },
   actionButton: {
-    borderRadius: 15,
+    borderRadius: 15 * scale,
     overflow: 'hidden',
   },
   actionButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 15,
-    gap: 10,
+    padding: 15 * scale,
+    gap: 10 * scale,
   },
   actionButtonText: {
     color: '#9381FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
     fontWeight: 'bold',
   },
   infoCard: {
     backgroundColor: 'rgba(248, 247, 255, 0.15)',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: 20 * scale,
+    padding: 20 * scale,
+    marginBottom: 20 * scale,
   },
   infoTitle: {
     color: '#FFD8BE',
-    fontSize: 18,
-    marginBottom: 15,
+    fontSize: 18 * scale,
+    marginBottom: 15 * scale,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 10 * scale,
   },
   infoLabel: {
     color: '#F8F7FF',
@@ -539,52 +562,52 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#F8F7FF',
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 20 * scale,
+    padding: 20 * scale,
     width: '85%',
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 20 * scale,
     color: '#9381FF',
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 20 * scale,
   },
   currentKmContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 10,
+    marginBottom: 20 * scale,
+    gap: 10 * scale,
   },
   currentKmLabel: {
     color: '#9381FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
   },
   currentKmValue: {
     color: '#9381FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
     fontWeight: 'bold',
   },
   modalInput: {
     width: '100%',
-    height: 55,
+    height: 55 * scale,
     backgroundColor: 'rgba(147, 129, 255, 0.1)',
-    borderRadius: 15,
-    paddingHorizontal: 20,
+    borderRadius: 15 * scale,
+    paddingHorizontal: 20 * scale,
     color: '#9381FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
     borderWidth: 1,
     borderColor: 'rgba(147, 129, 255, 0.2)',
-    marginBottom: 20,
+    marginBottom: 20 * scale,
   },
   modalButtons: {
     flexDirection: 'row',
-    gap: 15,
+    gap: 15 * scale,
   },
   modalButton: {
     flex: 1,
-    height: 45,
-    borderRadius: 10,
+    height: 45 * scale,
+    borderRadius: 10 * scale,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -596,7 +619,7 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     color: '#9381FF',
-    fontSize: 16,
+    fontSize: 16 * scale,
     fontWeight: 'bold',
   },
 }); 

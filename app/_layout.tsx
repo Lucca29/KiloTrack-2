@@ -1,109 +1,84 @@
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StatusBar, StyleSheet, Platform } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Constants from 'expo-constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function RootLayout() {
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const isExpoGo = Constants.appOwnership === 'expo';
-        
-        if (!isExpoGo) {
-          const { auth } = await import('../firebaseConfig');
-          const { setPersistence, browserLocalPersistence } = await import('firebase/auth');
-          await setPersistence(auth, browserLocalPersistence);
-        }
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Erreur d\'initialisation:', error);
-        setIsLoading(false);
-      }
-    };
-
-    initAuth();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <View style={styles.rootContainer}>
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <LinearGradient
+        colors={['#9381FF', '#B8B8FF', '#9381FF']}
+        style={[StyleSheet.absoluteFill]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <SafeAreaProvider>
         <StatusBar 
           barStyle="light-content" 
-          backgroundColor="#9381FF"
-          translucent={Platform.OS === 'android'}
+          backgroundColor="transparent"
+          translucent={true}
         />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#FFD8BE" />
+        <View style={StyleSheet.absoluteFill}>
+          <SafeAreaView 
+            style={[
+              styles.container, 
+              Platform.OS === 'android' && { paddingTop: StatusBar.currentHeight / 2 }
+            ]} 
+            edges={['right', 'left']}
+          >
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: styles.contentStyle,
+                animation: 'none',
+              }}
+            >
+              <Stack.Screen 
+                name="(auth)" 
+                options={{ 
+                  headerShown: false,
+                  gestureEnabled: false,
+                }} 
+              />
+              <Stack.Screen 
+                name="(app)" 
+                options={{ 
+                  headerShown: false,
+                  gestureEnabled: false,
+                }} 
+              />
+              <Stack.Screen 
+                name="index" 
+                options={{ 
+                  headerShown: false,
+                  gestureEnabled: false,
+                }} 
+              />
+            </Stack>
+          </SafeAreaView>
         </View>
-      </View>
-    );
-  }
-
-  return (
-    <SafeAreaProvider style={styles.rootContainer}>
-      <StatusBar 
-        barStyle="light-content" 
-        backgroundColor="#9381FF"
-        translucent={Platform.OS === 'android'}
-      />
-      <View style={styles.container}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: styles.contentStyle,
-            animation: 'none',
-            fullScreenGestureEnabled: false,
-          }}
-        >
-          <Stack.Screen 
-            name="(auth)" 
-            options={{ 
-              headerShown: false,
-              gestureEnabled: false,
-            }} 
-          />
-          <Stack.Screen 
-            name="(app)" 
-            options={{ 
-              headerShown: false,
-              gestureEnabled: false,
-            }} 
-          />
-          <Stack.Screen 
-            name="index" 
-            options={{ 
-              headerShown: false,
-              gestureEnabled: false,
-            }} 
-          />
-        </Stack>
-      </View>
-    </SafeAreaProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
-  rootContainer: {
-    flex: 1,
-    backgroundColor: '#9381FF',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#9381FF',
+    backgroundColor: 'transparent',
   },
   contentStyle: {
-    flex: 1,
-    backgroundColor: '#9381FF',
+    backgroundColor: 'transparent',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#9381FF',
+    backgroundColor: 'transparent',
   },
 }); 
