@@ -398,7 +398,10 @@ export default function SettingsScreen() {
                     </View>
                   ))
                 ) : (
-                  <Text style={styles.noHistoryText}>
+                  <Text style={[
+                    styles.noHistoryText,
+                    theme.isDarkMode && { color: '#FFFFFF' }
+                  ]}>
                     Aucun historique disponible
                   </Text>
                 )}
@@ -585,8 +588,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   noHistoryText: {
+    color: '#F8F7FF',
+    fontSize: 16,
     textAlign: 'center',
-    opacity: 0.7,
     padding: 20,
   },
   deleteButton: {

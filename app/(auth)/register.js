@@ -16,8 +16,11 @@ import { auth } from '../../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../app/context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
+  const { theme, toggleTheme } = useTheme();
   const [focusedInput, setFocusedInput] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -78,11 +81,29 @@ export default function RegisterScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <LinearGradient
-          colors={['#9381FF', '#B8B8FF', '#9381FF']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          colors={theme.isDarkMode ? 
+            ['#1A1A1A', '#2A2A2A', '#1A1A1A'] : 
+            ['#9381FF', '#B8B8FF', '#9381FF']
+          }
           style={styles.background}
         />
+
+        <TouchableOpacity 
+          style={styles.themeButton}
+          onPress={toggleTheme}
+        >
+          <LinearGradient
+            colors={['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
+            style={styles.themeButtonGradient}
+          >
+            <Ionicons 
+              name={theme.isDarkMode ? "sunny" : "moon"} 
+              size={24} 
+              color="#FFD8BE" 
+            />
+          </LinearGradient>
+        </TouchableOpacity>
+
         <SafeAreaView style={styles.safeArea}>
           <View style={styles.formContainer}>
             <Text style={styles.title}>Inscription</Text>
@@ -245,5 +266,18 @@ const styles = StyleSheet.create({
     color: '#FFD8BE',
     textAlign: 'center',
     fontSize: 14
-  }
+  },
+  themeButton: {
+    position: 'absolute',
+    top: 70,
+    right: 20,
+    zIndex: 1,
+  },
+  themeButtonGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }); 

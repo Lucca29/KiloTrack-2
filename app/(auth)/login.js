@@ -17,6 +17,8 @@ import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../app/context/ThemeContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -38,6 +40,7 @@ if (Platform.OS === 'ios') {
 const scale = Math.min(width, height) / baseWidth;
 
 export default function LoginScreen() {
+  const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -105,6 +108,30 @@ export default function LoginScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
+        <LinearGradient
+          colors={theme.isDarkMode ? 
+            ['#1A1A1A', '#2A2A2A', '#1A1A1A'] : 
+            ['#9381FF', '#B8B8FF', '#9381FF']
+          }
+          style={StyleSheet.absoluteFill}
+        />
+        
+        <TouchableOpacity 
+          style={styles.themeButton}
+          onPress={toggleTheme}
+        >
+          <LinearGradient
+            colors={['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
+            style={styles.themeButtonGradient}
+          >
+            <Ionicons 
+              name={theme.isDarkMode ? "sunny" : "moon"} 
+              size={24} 
+              color="#FFD8BE" 
+            />
+          </LinearGradient>
+        </TouchableOpacity>
+
         <View style={styles.content}>
           <Text style={styles.title}>Connexion</Text>
           
@@ -221,5 +248,18 @@ const styles = StyleSheet.create({
     color: '#FFD8BE',
     textAlign: 'center',
     fontSize: 14 * scale,
+  },
+  themeButton: {
+    position: 'absolute',
+    top: 70,
+    right: 20,
+    zIndex: 1,
+  },
+  themeButtonGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }); 
