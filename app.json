@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Milesio",
-    "slug": "Milesio",
-    "version": "6.1.2",
+    "name": "KiloTrack",
+    "slug": "kilotrack",
+    "version": "14",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "kilotrack",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "1.0.0",
-      "bundleIdentifier": "com.lucca29.KiloTrack",
+      "buildNumber": "15",
+      "bundleIdentifier": "com.votrecompany.cartracking",
       "deploymentTarget": "16.0",
       "config": {
         "usesNonExemptEncryption": false
@@ -27,8 +27,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 5,
-      "package": "com.votrecompany.cartracking"
+      "package": "com.votrecompany.kilotrack"
     },
     "web": {
       "bundler": "metro",
@@ -63,7 +62,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "70e463d3-b588-4979-bf56-de5a9ec0b85e"
+        "projectId": "5d5dc5b5-f96d-41d1-9339-3f896b1499db"
       }
     },
     "androidStatusBar": {

@@ -1,3 +1,4 @@
+import './polyfills';
 import { initializeApp, getApp } from 'firebase/app';
 import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
