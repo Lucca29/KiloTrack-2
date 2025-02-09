@@ -19,6 +19,7 @@ import { router } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { auth, firestore } from '../../firebaseConfig';
 import { doc, setDoc, getDoc, collection, addDoc } from 'firebase/firestore';
+import { useTheme } from '../../app/context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -41,6 +42,7 @@ if (Platform.OS === 'ios') {
 const scale = Math.min(width, height) / baseWidth;
 
 export default function VehicleConfigScreen() {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -150,9 +152,9 @@ export default function VehicleConfigScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <LinearGradient
-          colors={['#9381FF', '#B8B8FF', '#9381FF']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+          colors={theme.isDarkMode ? 
+            ['#1A1A1A', '#2A2A2A'] : 
+            ['#9381FF', '#B8B8FF', '#9381FF']}
           style={styles.background}
         />
         <SafeAreaView style={styles.safeArea}>
@@ -181,10 +183,19 @@ export default function VehicleConfigScreen() {
               <TextInput
                 style={[
                   styles.input,
+                  { 
+                    backgroundColor: theme.isDarkMode ? 
+                      'rgba(61, 61, 61, 0.3)' : 
+                      'rgba(248, 247, 255, 0.15)',
+                    color: theme.colors.text,
+                    borderColor: theme.colors.border
+                  },
                   focusedInput === 'currentKm' && styles.inputFocused
                 ]}
                 placeholder="Kilométrage actuel"
-                placeholderTextColor="rgba(147, 129, 255, 0.5)"
+                placeholderTextColor={theme.isDarkMode ? 
+                  'rgba(248, 247, 255, 0.5)' : 
+                  'rgba(147, 129, 255, 0.5)'}
                 onFocus={() => setFocusedInput('currentKm')}
                 onBlur={() => setFocusedInput(null)}
                 value={currentKm}
@@ -196,10 +207,19 @@ export default function VehicleConfigScreen() {
               <TextInput
                 style={[
                   styles.input,
+                  { 
+                    backgroundColor: theme.isDarkMode ? 
+                      'rgba(61, 61, 61, 0.3)' : 
+                      'rgba(248, 247, 255, 0.15)',
+                    color: theme.colors.text,
+                    borderColor: theme.colors.border
+                  },
                   focusedInput === 'yearlyKm' && styles.inputFocused
                 ]}
                 placeholder="Kilométrage annuel autorisé"
-                placeholderTextColor="rgba(147, 129, 255, 0.5)"
+                placeholderTextColor={theme.isDarkMode ? 
+                  'rgba(248, 247, 255, 0.5)' : 
+                  'rgba(147, 129, 255, 0.5)'}
                 onFocus={() => setFocusedInput('yearlyKm')}
                 onBlur={() => setFocusedInput(null)}
                 value={yearlyKm}
@@ -211,10 +231,19 @@ export default function VehicleConfigScreen() {
               <TextInput
                 style={[
                   styles.input,
+                  { 
+                    backgroundColor: theme.isDarkMode ? 
+                      'rgba(61, 61, 61, 0.3)' : 
+                      'rgba(248, 247, 255, 0.15)',
+                    color: theme.colors.text,
+                    borderColor: theme.colors.border
+                  },
                   focusedInput === 'leaseDuration' && styles.inputFocused
                 ]}
                 placeholder="Durée du leasing (en mois)"
-                placeholderTextColor="rgba(147, 129, 255, 0.5)"
+                placeholderTextColor={theme.isDarkMode ? 
+                  'rgba(248, 247, 255, 0.5)' : 
+                  'rgba(147, 129, 255, 0.5)'}
                 onFocus={() => setFocusedInput('leaseDuration')}
                 onBlur={() => setFocusedInput(null)}
                 value={leaseDuration}
@@ -230,15 +259,17 @@ export default function VehicleConfigScreen() {
               disabled={loading}
             >
               <LinearGradient
-                colors={['#FFD8BE', '#FFEEDD']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                colors={theme.isDarkMode ? 
+                  ['#3D3D3D', '#2A2A2A'] : 
+                  ['#FFD8BE', '#FFEEDD']}
                 style={styles.buttonGradient}
               >
                 {loading ? (
-                  <ActivityIndicator color="#9381FF" />
+                  <ActivityIndicator color={theme.isDarkMode ? '#FFD8BE' : '#9381FF'} />
                 ) : (
-                  <Text style={styles.buttonText}>
+                  <Text style={[styles.buttonText, { 
+                    color: theme.isDarkMode ? '#FFD8BE' : '#9381FF' 
+                  }]}>
                     {isUpdate ? 'Mettre à jour' : 'Confirmer'}
                   </Text>
                 )}

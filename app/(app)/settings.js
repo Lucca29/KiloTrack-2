@@ -22,6 +22,7 @@ import { doc, deleteDoc, collection, query, orderBy, getDocs, writeBatch } from 
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { testReviewPrompt } from './components/StoreReview';
+import { useTheme } from '../../app/context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -44,6 +45,7 @@ if (Platform.OS === 'ios') {
 const scale = Math.min(width, height) / baseWidth;
 
 export default function SettingsScreen() {
+  const { theme } = useTheme();
   const [kmHistory, setKmHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const swipeableRefs = useRef(new Map()).current;
@@ -281,7 +283,9 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#9381FF', '#B8B8FF', '#9381FF']}
+        colors={theme.isDarkMode ? 
+          ['#1A1A1A', '#2A2A2A'] : 
+          ['#9381FF', '#B8B8FF', '#9381FF']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.background}
@@ -292,16 +296,22 @@ export default function SettingsScreen() {
             style={styles.backButton}
             onPress={() => router.back()}
           >
-            <Ionicons name="chevron-back" size={24} color="#F8F7FF" />
+            <Ionicons name="chevron-back" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <Text style={styles.title}>Paramètres</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            Paramètres
+          </Text>
           <View style={styles.placeholder} />
         </View>
 
         <ScrollView style={styles.scrollView}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Compte</Text>
-            <View style={styles.card}>
+            <View style={[styles.card, {
+              backgroundColor: theme.isDarkMode ? 
+                'rgba(61, 61, 61, 0.3)' : 
+                'rgba(248, 247, 255, 0.15)'
+            }]}>
               <Text style={styles.emailText}>{auth.currentUser?.email}</Text>
             </View>
           </View>
@@ -331,13 +341,15 @@ export default function SettingsScreen() {
               onPress={() => router.push('/(app)/vehicle-config')}
             >
               <LinearGradient
-                colors={['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
+                colors={theme.isDarkMode ? 
+                  ['#3D3D3D', '#2A2A2A'] : 
+                  ['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.buttonGradient}
               >
-                <Ionicons name="car" size={24} color="#FFD8BE" />
-                <Text style={styles.configText}>Reconfigurer mon véhicule</Text>
+                <Ionicons name="car" size={24} color={theme.colors.secondary} />
+                <Text style={[styles.configText, { color: theme.colors.secondary }]}>Reconfigurer mon véhicule</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -346,13 +358,15 @@ export default function SettingsScreen() {
               onPress={testReviewPrompt}
             >
               <LinearGradient
-                colors={['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
+                colors={theme.isDarkMode ? 
+                  ['#3D3D3D', '#2A2A2A'] : 
+                  ['rgba(255, 216, 190, 0.1)', 'rgba(255, 216, 190, 0.2)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.buttonGradient}
               >
-                <Ionicons name="star" size={24} color="#FFD8BE" />
-                <Text style={styles.configText}>Donnez votre avis</Text>
+                <Ionicons name="star" size={24} color={theme.colors.secondary} />
+                <Text style={[styles.configText, { color: theme.colors.secondary }]}>Donnez votre avis</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -361,13 +375,15 @@ export default function SettingsScreen() {
               onPress={handleLogout}
             >
               <LinearGradient
-                colors={['rgba(255, 82, 82, 0.1)', 'rgba(255, 82, 82, 0.2)']}
+                colors={theme.isDarkMode ? 
+                  ['#3D3D3D', '#2A2A2A'] : 
+                  ['rgba(255, 82, 82, 0.1)', 'rgba(255, 82, 82, 0.2)']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.buttonGradient}
               >
-                <Ionicons name="log-out" size={24} color="#FF5252" />
-                <Text style={styles.logoutText}>Se déconnecter</Text>
+                <Ionicons name="log-out" size={24} color={theme.colors.secondary} />
+                <Text style={[styles.logoutText, { color: theme.colors.secondary }]}>Se déconnecter</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -375,7 +391,7 @@ export default function SettingsScreen() {
               style={styles.deleteAccountButton}
               onPress={handleDeleteAccount}
             >
-              <Text style={styles.deleteAccountText}>Supprimer mon compte</Text>
+              <Text style={[styles.deleteAccountText, { color: theme.colors.secondary }]}>Supprimer mon compte</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

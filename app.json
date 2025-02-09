@@ -1,6 +1,7 @@
 {
   "expo": {
-    "name": "KiloTrack",
+    "name": "Milésio",
+    "displayName": "Milésio",
     "slug": "kilotrack",
     "version": "14",
     "orientation": "portrait",
@@ -10,7 +11,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "15",
+      "buildNumber": "15.2",
       "bundleIdentifier": "com.votrecompany.cartracking",
       "deploymentTarget": "16.0",
       "config": {

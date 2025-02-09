@@ -5,10 +5,12 @@ import { useAuth } from '../hooks/useAuth';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import { useTheme } from '../app/context/ThemeContext';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
   const { checkAuth } = useAuth();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const bootstrapAsync = async () => {
@@ -49,8 +51,13 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#9381FF' }}>
-        <ActivityIndicator size="large" color="#FFFFFF" />
+      <View style={{ 
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: theme.isDarkMode ? '#1A1A1A' : '#9381FF'
+      }}>
+        <ActivityIndicator size="large" color={theme.isDarkMode ? '#FFD8BE' : '#FFFFFF'} />
       </View>
     );
   }

@@ -16,10 +16,12 @@ import { auth, firestore } from '../../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 import { router } from 'expo-router';
 import { checkShowReviewInStats } from './components/StoreReview';
+import { useTheme } from '../../app/context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function StatisticsScreen() {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
 
@@ -99,9 +101,9 @@ export default function StatisticsScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#9381FF', '#B8B8FF', '#9381FF']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={theme.isDarkMode ? 
+          ['#1A1A1A', '#2A2A2A'] : 
+          ['#9381FF', '#B8B8FF', '#9381FF']}
         style={styles.background}
       />
       <SafeAreaView style={styles.safeArea}>
@@ -118,8 +120,14 @@ export default function StatisticsScreen() {
 
         <ScrollView style={styles.scrollView}>
           {/* Progression générale */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Progression générale</Text>
+          <View style={[styles.card, {
+            backgroundColor: theme.isDarkMode ? 
+              'rgba(61, 61, 61, 0.3)' : 
+              'rgba(248, 247, 255, 0.15)'
+          }]}>
+            <Text style={[styles.cardTitle, { color: '#FFD8BE' }]}>
+              Progression générale
+            </Text>
             <View style={styles.progressBar}>
               <View 
                 style={[
@@ -137,8 +145,14 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Kilométrage */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Kilométrage</Text>
+          <View style={[styles.card, {
+            backgroundColor: theme.isDarkMode ? 
+              'rgba(61, 61, 61, 0.3)' : 
+              'rgba(248, 247, 255, 0.15)'
+          }]}>
+            <Text style={[styles.cardTitle, { color: '#FFD8BE' }]}>
+              Kilométrage
+            </Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Actuel:</Text>
               <Text style={styles.statValue}>{stats.currentKm} km</Text>
@@ -159,8 +173,14 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Moyennes */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Moyennes quotidiennes</Text>
+          <View style={[styles.card, {
+            backgroundColor: theme.isDarkMode ? 
+              'rgba(61, 61, 61, 0.3)' : 
+              'rgba(248, 247, 255, 0.15)'
+          }]}>
+            <Text style={[styles.cardTitle, { color: '#FFD8BE' }]}>
+              Moyennes quotidiennes
+            </Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Théorique:</Text>
               <Text style={styles.statValue}>{stats.theoreticalKmPerDay} km/jour</Text>
@@ -179,8 +199,14 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Prévisions */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Prévisions</Text>
+          <View style={[styles.card, {
+            backgroundColor: theme.isDarkMode ? 
+              'rgba(61, 61, 61, 0.3)' : 
+              'rgba(248, 247, 255, 0.15)'
+          }]}>
+            <Text style={[styles.cardTitle, { color: '#FFD8BE' }]}>
+              Prévisions
+            </Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Kilométrage final estimé:</Text>
               <Text style={[
@@ -197,8 +223,14 @@ export default function StatisticsScreen() {
           </View>
 
           {/* Dates */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Informations</Text>
+          <View style={[styles.card, {
+            backgroundColor: theme.isDarkMode ? 
+              'rgba(61, 61, 61, 0.3)' : 
+              'rgba(248, 247, 255, 0.15)'
+          }]}>
+            <Text style={[styles.cardTitle, { color: '#FFD8BE' }]}>
+              Informations
+            </Text>
             <View style={styles.statRow}>
               <Text style={styles.statLabel}>Date de début:</Text>
               <Text style={styles.statValue}>{stats.startDate}</Text>

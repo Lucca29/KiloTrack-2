@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { auth, firestore } from '../../firebaseConfig';
 import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
+import { useTheme } from '../../app/context/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -49,6 +50,15 @@ export default function DashboardScreen() {
   const [newKmValue, setNewKmValue] = useState('');
   const [updating, setUpdating] = useState(false);
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
+
+  if (!theme) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#FFD8BE" />
+      </View>
+    );
+  }
 
   const calculateStats = (data) => {
     const startDate = new Date(data.startDate);
@@ -302,24 +312,60 @@ export default function DashboardScreen() {
     </View>
   );
 
+  const dynamicStyles = {
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    background: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    title: {
+      fontSize: 24,
+      color: '#F8F7FF',
+      fontWeight: 'bold',
+    },
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, dynamicStyles.container]}>
       <LinearGradient
-        colors={['#9381FF', '#B8B8FF', '#9381FF']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        colors={theme.isDarkMode ? 
+          ['#1A1A1A', '#2A2A2A', '#1A1A1A'] : 
+          ['#9381FF', '#B8B8FF', '#9381FF']
+        }
         style={styles.background}
       />
       <SafeAreaView style={styles.safeArea}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.header}>
             <Text style={styles.title}>Tableau de bord</Text>
-            <TouchableOpacity 
-              style={styles.settingsButton}
-              onPress={() => router.push('/settings')}
-            >
-              <Ionicons name="person-circle-outline" size={28} color="#FFD8BE" />
-            </TouchableOpacity>
+            <View style={styles.headerButtons}>
+              <TouchableOpacity 
+                style={styles.iconButton}
+                onPress={toggleTheme}
+              >
+                <Ionicons 
+                  name={theme.isDarkMode ? "moon" : "moon-outline"} 
+                  size={24} 
+                  color={theme.colors.secondary} 
+                />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.settingsButton}
+                onPress={() => router.push('/settings')}
+              >
+                <Ionicons 
+                  name="person-circle-outline" 
+                  size={28} 
+                  color={theme.colors.secondary} 
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Carte principale */}
@@ -422,11 +468,17 @@ const styles = StyleSheet.create({
     marginBottom: 20 * scale,
   },
   title: {
-    fontSize: 32 * scale,
+    fontSize: 24,
     color: '#F8F7FF',
     fontWeight: 'bold',
-    marginBottom: 10 * scale,
-    textAlign: 'center',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10 * scale,
+  },
+  iconButton: {
+    padding: 8 * scale,
   },
   settingsButton: {
     padding: 8 * scale,

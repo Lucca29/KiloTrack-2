@@ -17,6 +17,9 @@ import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../app/context/ThemeContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '../../firebaseConfig';
 
 const { width, height } = Dimensions.get('window');
 let baseWidth = Platform.OS === 'ios' ? 375 : 360;
@@ -38,6 +41,7 @@ if (Platform.OS === 'ios') {
 const scale = Math.min(width, height) / baseWidth;
 
 export default function LoginScreen() {
+  const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,6 +78,16 @@ export default function LoginScreen() {
     }
   };
 
+  const checkVehicleConfig = async (userId) => {
+    try {
+      const vehicleDoc = await getDoc(doc(firestore, 'vehicles', userId));
+      return vehicleDoc.exists();
+    } catch (error) {
+      console.error('Erreur lors de la vérification du véhicule:', error);
+      return false;
+    }
+  };
+
   const handleLogin = async (emailToUse = email, passwordToUse = password) => {
     if (!emailToUse || !passwordToUse) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
@@ -84,7 +98,16 @@ export default function LoginScreen() {
       setLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, emailToUse, passwordToUse);
       await saveCredentials(emailToUse, passwordToUse);
-      router.replace('/(app)/dashboard');
+      
+      // Vérifier si le véhicule est configuré
+      const hasVehicleConfig = await checkVehicleConfig(userCredential.user.uid);
+      
+      // Rediriger vers la configuration si pas de véhicule, sinon vers le dashboard
+      if (!hasVehicleConfig) {
+        router.replace('/(app)/vehicle-config');
+      } else {
+        router.replace('/(app)/dashboard');
+      }
     } catch (error) {
       console.error('Erreur de connexion:', error);
       let errorMessage = 'Une erreur est survenue lors de la connexion';
@@ -94,7 +117,6 @@ export default function LoginScreen() {
       }
       
       Alert.alert('Erreur', errorMessage);
-      // Si la connexion échoue, on efface les identifiants sauvegardés
       await AsyncStorage.removeItem('userEmail');
       await AsyncStorage.removeItem('userPassword');
     } finally {
@@ -102,19 +124,47 @@ export default function LoginScreen() {
     }
   };
 
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <LinearGradient
+          colors={theme.isDarkMode ? 
+            ['#1A1A1A', '#2A2A2A'] : 
+            ['#9381FF', '#B8B8FF', '#9381FF']}
+          style={styles.background}
+        />
+        <ActivityIndicator size="large" color={theme.isDarkMode ? '#FFD8BE' : '#FFD8BE'} />
+      </View>
+    );
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
+        <LinearGradient
+          colors={theme.isDarkMode ? 
+            ['#1A1A1A', '#2A2A2A'] : 
+            ['#9381FF', '#B8B8FF', '#9381FF']}
+          style={styles.background}
+        />
         <View style={styles.content}>
           <Text style={styles.title}>Connexion</Text>
           
           <TextInput
             style={[
               styles.input,
-              focusedInput === 'email' && styles.inputFocused
+              { 
+                backgroundColor: theme.isDarkMode ? 
+                  'rgba(61, 61, 61, 0.3)' : 
+                  'rgba(248, 247, 255, 0.15)',
+                color: theme.colors.text,
+                borderColor: theme.colors.border
+              }
             ]}
             placeholder="Email"
-            placeholderTextColor="rgba(248, 247, 255, 0.5)"
+            placeholderTextColor={theme.isDarkMode ? 
+              'rgba(248, 247, 255, 0.5)' : 
+              'rgba(147, 129, 255, 0.5)'}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -126,10 +176,18 @@ export default function LoginScreen() {
           <TextInput
             style={[
               styles.input,
-              focusedInput === 'password' && styles.inputFocused
+              { 
+                backgroundColor: theme.isDarkMode ? 
+                  'rgba(61, 61, 61, 0.3)' : 
+                  'rgba(248, 247, 255, 0.15)',
+                color: theme.colors.text,
+                borderColor: theme.colors.border
+              }
             ]}
             placeholder="Mot de passe"
-            placeholderTextColor="rgba(248, 247, 255, 0.5)"
+            placeholderTextColor={theme.isDarkMode ? 
+              'rgba(248, 247, 255, 0.5)' : 
+              'rgba(147, 129, 255, 0.5)'}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -221,5 +279,17 @@ const styles = StyleSheet.create({
     color: '#FFD8BE',
     textAlign: 'center',
     fontSize: 14 * scale,
+  },
+  background: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }); 

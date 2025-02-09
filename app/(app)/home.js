@@ -10,9 +10,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { auth } from '../../firebaseConfig';
 import { signOut } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../app/context/ThemeContext';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const { theme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -26,15 +28,19 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#9381FF', '#B8B8FF', '#9381FF']}
+        colors={theme.isDarkMode ? 
+          ['#1A1A1A', '#2A2A2A'] : 
+          ['#9381FF', '#B8B8FF', '#9381FF']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.background}
       />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
-          <Text style={styles.title}>Bienvenue !</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: theme.colors.text }]}>
+            Bienvenue !
+          </Text>
+          <Text style={[styles.subtitle, { color: theme.colors.secondary }]}>
             {auth.currentUser?.email}
           </Text>
           
@@ -43,12 +49,18 @@ const HomeScreen = () => {
             onPress={handleLogout}
           >
             <LinearGradient
-              colors={['#FFD8BE', '#FFEEDD']}
+              colors={theme.isDarkMode ? 
+                ['#3D3D3D', '#2A2A2A'] : 
+                ['#FFD8BE', '#FFEEDD']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.buttonGradient}
             >
-              <Text style={styles.buttonText}>Se déconnecter</Text>
+              <Text style={[styles.buttonText, { 
+                color: theme.isDarkMode ? '#FFD8BE' : '#9381FF' 
+              }]}>
+                Se déconnecter
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>

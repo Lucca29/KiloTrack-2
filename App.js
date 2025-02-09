@@ -8,6 +8,7 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth, setPersistence, browserLocalPersistence, indexedDBLocalPersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ThemeProvider } from './app/context/ThemeContext';
 
 const firebaseConfig = {
   // Vos configurations Firebase
@@ -59,7 +60,11 @@ function AppContent() {
 // Export par défaut
 export default function App() {
   console.log('Initialisation de App');
-  return <AppContent />;
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
 }
 
 const styles = StyleSheet.create({

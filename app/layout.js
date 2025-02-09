@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StatusBar, StyleSheet } from 'react-native';
 import { auth } from '../firebaseConfig';
 import { setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { useTheme } from '../app/context/ThemeContext';
 
 export default function Layout() {
   const [isLoading, setIsLoading] = useState(true);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const initAuth = async () => {
@@ -28,9 +30,16 @@ export default function Layout() {
 
   if (isLoading) {
     return (
-      <View style={styles.rootContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#9381FF" />
-        <View style={styles.loadingContainer}>
+      <View style={[styles.rootContainer, { 
+        backgroundColor: theme?.isDarkMode ? '#1A1A1A' : '#9381FF' 
+      }]}>
+        <StatusBar 
+          barStyle="light-content" 
+          backgroundColor={theme?.isDarkMode ? '#1A1A1A' : '#9381FF'} 
+        />
+        <View style={[styles.loadingContainer, { 
+          backgroundColor: theme?.isDarkMode ? '#1A1A1A' : '#9381FF' 
+        }]}>
           <ActivityIndicator size="large" color="#FFD8BE" />
         </View>
       </View>
@@ -38,13 +47,20 @@ export default function Layout() {
   }
 
   return (
-    <View style={styles.rootContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#9381FF" />
+    <View style={[styles.rootContainer, { 
+      backgroundColor: theme?.isDarkMode ? '#1A1A1A' : '#9381FF' 
+    }]}>
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor={theme?.isDarkMode ? '#1A1A1A' : '#9381FF'} 
+      />
       <Stack
         initialRouteName="index"
         screenOptions={{
           headerShown: false,
-          contentStyle: styles.contentStyle,
+          contentStyle: [styles.contentStyle, { 
+            backgroundColor: theme?.isDarkMode ? '#1A1A1A' : '#9381FF' 
+          }],
           animation: 'fade',
           fullScreenGestureEnabled: false,
         }}
@@ -78,15 +94,13 @@ export default function Layout() {
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: '#9381FF',
   },
   contentStyle: {
-    backgroundColor: '#9381FF',
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#9381FF',
   },
 }); 
